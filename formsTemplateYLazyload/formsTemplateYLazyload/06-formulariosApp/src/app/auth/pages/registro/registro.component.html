@@ -32,7 +32,7 @@
                            placeholder="Correo electrónico">
                            <span class="form-text text-danger"
                                  *ngIf="invalidField( 'email' )">
-                               El correo es obligatorio
+                               {{ emailErrorMsg }}
                            </span>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                            formControlName="username"
                            placeholder="Nomber código del usuario">
                            <span class="form-text text-danger"
-                                 *ngIf="noPuedeSerDenSiste('username')">
+                                 *ngIf="invalidField( 'username' )">
                                 El username no puede ser DenSiste
                            </span>
                 </div>
@@ -58,7 +58,12 @@
                 <div class="col-sm-9">
                     <input type="password"
                            class="form-control"
+                           formControlName="password"
                            placeholder="Password de su cuenta">
+                           <span class="form-text text-danger"
+                                 *ngIf="invalidField( 'password' )">
+                                La contraseña debe ser mayor a 6 caracteres.
+                           </span>
                 </div>
             </div>
 
@@ -68,13 +73,19 @@
                 <div class="col-sm-9">
                     <input type="password"
                            class="form-control"
+                           formControlName="password2"
                            placeholder="Confirmar la contraseña">
+                           <span class="form-text text-danger"
+                                 *ngIf="invalidField( 'password2' )">
+                                Las contraseñas deben ser iguales.
+                           </span>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col">
                     <button class="btn btn-primary float-end"
+                            [disabled]="miFormulario.pending"
                             type="submit">
                         Crear
                     </button>
@@ -85,6 +96,9 @@
 </div>
 
 <h2>Form valid: {{ miFormulario.valid }}</h2>
+<h2>Form status: {{ miFormulario.status }}</h2>
+<h2>Form errors</h2>
+<pre>{{ miFormulario.errors | json}}</pre>
 
 <h5>Nombre</h5>
 <pre>{{ miFormulario.controls['nombre'].errors | json}}</pre>
@@ -94,3 +108,9 @@
 
 <h5>Username</h5>
 <pre>{{ miFormulario.controls['username'].errors | json}}</pre>
+
+<h5>Password</h5>
+<pre>{{ miFormulario.controls['password'].errors | json}}</pre>
+
+<h5>Password2</h5>
+<pre>{{ miFormulario.controls['password2'].errors | json}}</pre>

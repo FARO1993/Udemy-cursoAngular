@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ValidatorService } from 'src/app/shared/validator.service';
+import { EmailValidatorService } from '../../../shared/validator/email-validator.service';
 
 @Component({
   selector: 'app-registro',
@@ -10,35 +12,48 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 
 export class RegistroComponent implements OnInit {
 
-  //TODO: Temporal
-  nombreApellidoPattern: string = '([a-zA-Z]+) ([a-zA-Z]+)';
-  emailPattern: string = '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$';
-
-  noPuedeSerDenSiste( argumento: FormControl ) {
-    const valor: string = argumento.value?.trim().toLowerCase();
-    if ( valor === 'densiste' ){
-      return {
-        noDenSiste: true,
-      }
-    }
-
-    return null;
-  }
-
   miFormulario: FormGroup = this.fb.group({
-    nombre: ['', [ Validators.required, Validators.pattern( this.nombreApellidoPattern ) ]],
-    email: ['', [ Validators.required, Validators.pattern( this.emailPattern )]],
-    username: ['', [ Validators.required, this.noPuedeSerDenSiste ]]
+    nombre: ['', [ Validators.required, Validators.pattern( this.validatorService.nombreApellidoPattern ) ]],
+    email: ['', [ Validators.required, Validators.pattern( this.validatorService.emailPattern )], [ this.emailValidator ]],
+    username: ['', [ Validators.required, this.validatorService.noPuedeSerDenSiste ]],
+    password: ['', [ Validators.required, Validators.minLength(6) ]],
+    password2: ['', [ Validators.required ]]
+  }, {
+    validators: [ this.validatorService.camposIguales('password', 'password2') ]
   })
 
-  constructor( private fb: FormBuilder ) { }
+  get emailErrorMsg(): string {
+    
+    const errors = this.miFormulario.get('email')?.errors;
+
+    if( errors?.[ 'required' ] ) {
+      return 'Email es obligatorio.'
+    }
+
+    if( errors?.[ 'pattern' ] ) {
+      return 'El formato de correo es incorrecto.'
+    }
+
+    if( errors?.[ 'emailError' ] ) {
+      return 'El correo ya existe.'
+    }
+
+    return '';
+
+  }
+
+  constructor( private fb: FormBuilder,
+               private validatorService: ValidatorService,
+               private emailValidator: EmailValidatorService ) { }
 
   ngOnInit(): void {
 
     this.miFormulario.reset({
       nombre: 'Facundo Rodriguez',
       email: 'test@test.com',
-      username: 'cobayo'
+      username: 'cobayo',
+      password: '123456',
+      password2: '123456'
     })
   }
 
